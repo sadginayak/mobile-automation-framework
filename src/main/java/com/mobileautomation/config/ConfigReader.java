@@ -9,11 +9,7 @@ import java.util.Properties;
  *
  * Does NOT decide which platform, device, environment, or app to run -
  * those are CI/TestNG-supplied parameters, resolved wherever ExecutionConfig
- * is assembled, not here.
- *
- * Does NOT read app paths - those are per-build values supplied by
- * CI/TestNG directly (system property / TestNG parameter), never stored
- * in this file.
+ * is assembled, not here
  *
  * Does NOT contain credentials - Sauce Labs / BrowserStack credentials
  * come from environment variables / CI secrets, read wherever
@@ -59,7 +55,13 @@ public class ConfigReader {
     public static String getDeviceVersion(String environment, String platform, String deviceKey) {
         return required("devices." + environment.toLowerCase() + "." + platform.toLowerCase() + "." + deviceKey + ".version");
     }
-
+    /**
+     * @param app         the app key CI/TestNG chose, e.g. "monefy"
+     * @param environment the environment name CI/TestNG chose, e.g. "saucelabs"
+     */
+    public static String getAppPath(String app, String environment) {
+        return required("apps." + app.toLowerCase() + "." + environment.toLowerCase() + ".path");
+    }
     /**
      * @param environment the environment name CI/TestNG chose, e.g. "saucelabs"
      */
