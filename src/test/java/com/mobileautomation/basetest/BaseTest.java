@@ -28,18 +28,18 @@ public class BaseTest {
     private static final ThreadLocal<PlatformHook> currentPlatformHook =
             new ThreadLocal<>();
 
-    @Parameters({"platform", "device", "environment", "appPath"})
+    @Parameters({"platform", "device", "environment", "app"})
     @BeforeMethod
     public void setUp(
             @Optional String platformParam,
             @Optional String deviceKey,
             @Optional String environment,
-            @Optional String appPath) {
+            @Optional String app) {
 
         platformParam = resolve(platformParam, "platform");
         deviceKey = resolve(deviceKey, "device");
         environment = resolve(environment, "environment");
-        appPath = resolve(appPath, "appPath");
+        app = resolve(app, "app");
 
         currentEnvironment.set(environment);
 
@@ -54,6 +54,8 @@ public class BaseTest {
 
         String endpointUrl =
                 ConfigReader.getEndpointUrl(environment);
+        String appPath =
+                ConfigReader.getAppPath(app, environment);
 
         Map<String, Object> extraCapabilities =
                 new HashMap<>(
