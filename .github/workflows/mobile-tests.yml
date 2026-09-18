@@ -16,10 +16,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: Task2-MonefyAutomation
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -37,11 +33,11 @@ jobs:
 
           SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
-        run: mvn -B test
+        run: mvn -B test -Denvironment=${{ inputs.environment }}
 
       - name: Upload test reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: test-reports
-          path: Task2-MonefyAutomation/reports/
+          path: reports/
