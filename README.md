@@ -1,44 +1,136 @@
-# Monefy Mobile Automation (Task 2)
+# Mobile Automation Framework
 
-## 📱 Project Scope
-This solution targets the **Monefy Android** application using **Sauce Labs** to ensure a standardized execution environment and demonstrate cloud-grid integration—essential for modern CI/CD scalability.
+Reusable mobile test automation framework built with Java, Appium and TestNG, designed to support multiple applications, devices, platforms and execution environments.
 
----
+The current implementation uses **Monefy** as the application under test.
 
-## 🏗️ Design Approach & Architecture
+## Tech Stack
 
-### **Page Object Model (POM)**
-I implemented a  **POM** architecture to ensure a clean separation between the test scripts and the UI locators. This reduces code duplication and makes the framework highly maintainable; any UI change in the app only requires a single update in the corresponding Page class.
+- Java 17
+- Appium
+- TestNG
+- Maven
+- Selenium WebDriver
+- Extent Reports
+- GitHub Actions
+- BrowserStack
+- Sauce Labs
 
-### **Class Responsibilities**
-* **`DriverFactory`**: Manages thread-safe driver instances using a **Factory Pattern** and **ThreadLocal**.
-* **`BasePage`**: The parent class for all pages, containing **Fluent Wait** wrappers and global interaction logic.
+## Architecture
 
-* **`ConfigReader`**: Centralized utility for credentials and environment properties.
-* **`TestListener`**: Interfaces with TestNG to trigger report logging and screenshot capture on failure.
+```text
+Test Layer
+    ↓
+Page / Application Layer
+    ↓
+Framework Layer
+    ↓
+Execution / Infrastructure
+```
 
-### **Smart Engineering**
-* **Smart UI Polling**: Handles the calculator's "append" behavior by polling the UI until the input is reset to zero.
-* **Data Integrity**: Uses Regex-based parsing to convert UI currency strings into `Double` for mathematical assertions.
+Key design principles:
 
----
+- Page Objects encapsulate application interactions.
+- `DriverFactory` is application-independent and manages Appium driver creation.
+- `ExecutionConfig` centralizes runtime execution settings.
+- Platform abstraction supports Android/iOS locator handling.
+- Application and environment configuration are separated from test logic.
+- Credentials are supplied through environment variables / CI secrets.
 
-## 📊 Reporting (Extent Reports)
-The framework is integrated with **Extent Reports** to provide rich, HTML-based execution dashboards.
-* **Visual Evidence**: Automatically embeds screenshots in the report upon test failure.
+## Execution
 
-* **Access**: Reports are generated in the `test-output/` or `target/` directory after execution.
+The framework supports:
 
----
+- Android
+- Local Appium execution
+- BrowserStack
+- Sauce Labs
+- GitHub Actions
+- Parallel TestNG execution
 
-## ⚙️ Setup & Execution
+Application paths and device configuration are resolved based on the selected application and execution environment.
 
-1. **Configure Credentials**: Update `src/test/resources/config.properties`:
-   - `username=YOUR_SAUCE_USERNAME`
-   - `access.key=YOUR_SAUCE_ACCESS_KEY`
+Example:
 
-2. **Run Tests**:
-   ```bash
-   mvn clean test
-🛠️ Tech Stack
-Java | Appium | TestNG | Maven | Extent Reports
+```text
+app = monefy
+environment = browserstack
+        ↓
+apps.monefy.browserstack.path
+```
+
+## Getting Started / Running Tests
+
+**Prerequisites**
+
+- JDK 17
+- Maven
+- Local Appium server, or valid BrowserStack/Sauce Labs credentials
+
+Set credentials as environment variables or CI secrets:
+
+```text
+BROWSERSTACK_USERNAME
+BROWSERSTACK_ACCESS_KEY
+SAUCE_USERNAME
+SAUCE_ACCESS_KEY
+```
+
+Run locally via Maven by selecting the execution environment and application:
+
+```bash
+mvn test -Denvironment=browserstack -Dapp=monefy
+```
+
+The GitHub Actions workflow can also be triggered manually, with the execution environment selected from the workflow input dropdown.
+
+## CI/CD
+
+GitHub Actions provides manual execution with the environment selected at runtime.
+
+```text
+GitHub Actions
+      ↓
+Environment + App
+      ↓
+Maven / TestNG
+      ↓
+Appium Driver
+      ↓
+BrowserStack / Sauce Labs
+```
+
+Cloud credentials are stored as GitHub Actions secrets and are not committed to the repository.
+
+## Reporting
+
+Test execution generates an Extent HTML report under `reports/`, with screenshots automatically attached on failure.
+
+Reports are timestamped per run, with the 5 most recent reports retained locally. In CI, reports are uploaded as a GitHub Actions workflow artifact.
+
+## Project Structure
+
+```text
+src/
+├── main/java/com/mobileautomation/
+│   ├── basepage/
+│   ├── capabilities/
+│   ├── config/
+│   ├── driver/
+│   ├── platform/
+│   └── utilities/
+│
+└── test/java/com/mobileautomation/
+    ├── basetest/
+    └── monefy/
+```
+
+## Current Limitations
+
+- iOS platform/locator abstraction exists by design but has not yet been implemented or proven end-to-end.
+- A retry mechanism for flaky cloud executions exists in the framework but is not currently wired into the test run.
+- The framework is designed for multi-application support, but this has currently been validated with one application (Monefy).
+
+## Purpose
+
+This project demonstrates the design of a maintainable mobile automation framework with separation between test logic, application interactions, framework services and execution infrastructure.
